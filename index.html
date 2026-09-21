@@ -11,7 +11,7 @@
 body{
 margin:0;
 background:#080808;
-color:white;
+color:#fff;
 font-family:Tahoma,Arial;
 }
 
@@ -30,9 +30,7 @@ background:#151515;
 border-bottom:1px solid #292929;
 }
 
-header h2{
-margin:0 0 6px;
-}
+header h2{margin:0 0 6px}
 
 #chat{
 flex:1;
@@ -101,17 +99,7 @@ color:white;
 <div>دستیار هوش مصنوعی وحید</div>
 </header>
 
-<div id="chat">
-
-<div class="msg ai">
-سلام وحید 👋
-<br>
-من Vahid AI هستم.
-<br>
-هر چیزی خواستی بپرس.
-</div>
-
-</div>
+<div id="chat"></div>
 
 <button class="clear" onclick="clearChat()">
 🗑️ پاک کردن گفتگو
@@ -119,10 +107,7 @@ color:white;
 
 <div class="bottom">
 
-<input
-id="msg"
-placeholder="پیامت رو بنویس..."
-autocomplete="off">
+<input id="msg" placeholder="پیامت رو بنویس..." autocomplete="off">
 
 <button id="sendBtn" onclick="send()">➤</button>
 
@@ -139,6 +124,49 @@ const input = document.getElementById("msg");
 const chat = document.getElementById("chat");
 const sendBtn = document.getElementById("sendBtn");
 
+const STORAGE_KEY = "vahid_ai_chat";
+
+
+// نمایش تاریخچه ذخیره شده
+function loadChat(){
+
+const saved = localStorage.getItem(STORAGE_KEY);
+
+if(saved){
+
+chat.innerHTML = saved;
+
+}else{
+
+chat.innerHTML = `
+<div class="msg ai">
+سلام وحید 👋
+<br>
+من Vahid AI هستم.
+<br>
+هر چیزی خواستی بپرس.
+</div>
+`;
+
+}
+
+chat.scrollTop = chat.scrollHeight;
+
+}
+
+
+// ذخیره تاریخچه
+function saveChat(){
+
+localStorage.setItem(
+STORAGE_KEY,
+chat.innerHTML
+);
+
+}
+
+
+// اضافه کردن پیام
 function addMessage(type,text){
 
 const div = document.createElement("div");
@@ -150,15 +178,19 @@ div.textContent =
 
 chat.appendChild(div);
 
+saveChat();
+
 chat.scrollTop = chat.scrollHeight;
 
 }
 
+
+// ارسال پیام
 async function send(){
 
 const message = input.value.trim();
 
-if(!message) return;
+if(!message)return;
 
 addMessage("user",message);
 
@@ -176,10 +208,9 @@ chat.appendChild(loading);
 
 try{
 
-const url =
-API + "?message=" + encodeURIComponent(message);
-
-const response = await fetch(url);
+const response = await fetch(
+API + "?message=" + encodeURIComponent(message)
+);
 
 const data = await response.json();
 
@@ -203,6 +234,8 @@ data.reply || "خطایی رخ داد."
 loading.textContent =
 "❌ ارتباط با سرور برقرار نشد.";
 
+saveChat();
+
 }
 
 sendBtn.disabled=false;
@@ -211,7 +244,11 @@ chat.scrollTop=chat.scrollHeight;
 
 }
 
+
+// پاک کردن تاریخچه
 function clearChat(){
+
+localStorage.removeItem(STORAGE_KEY);
 
 chat.innerHTML=`
 <div class="msg ai">
@@ -223,8 +260,12 @@ chat.innerHTML=`
 </div>
 `;
 
+saveChat();
+
 }
 
+
+// Enter
 input.addEventListener("keydown",function(e){
 
 if(e.key==="Enter"){
@@ -232,6 +273,10 @@ send();
 }
 
 });
+
+
+// شروع برنامه
+loadChat();
 
 </script>
 
