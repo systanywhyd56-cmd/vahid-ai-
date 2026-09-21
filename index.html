@@ -6,55 +6,92 @@
 <title>Vahid AI</title>
 
 <style>
+*{box-sizing:border-box}
+
 body{
-  margin:0;
-  background:#080808;
-  color:white;
-  font-family:Tahoma,Arial;
+margin:0;
+background:#080808;
+color:#fff;
+font-family:Tahoma,Arial;
 }
+
 .app{
-  max-width:600px;
-  height:100vh;
-  margin:auto;
-  display:flex;
-  flex-direction:column;
+max-width:650px;
+height:100vh;
+margin:auto;
+display:flex;
+flex-direction:column;
 }
+
 header{
-  padding:18px;
-  text-align:center;
-  background:#151515;
+padding:18px;
+text-align:center;
+background:#151515;
+border-bottom:1px solid #292929;
 }
+
+header h2{
+margin:0 0 6px;
+}
+
 #chat{
-  flex:1;
-  overflow:auto;
-  padding:15px;
+flex:1;
+overflow:auto;
+padding:15px;
 }
+
 .msg{
-  padding:12px;
-  margin:8px 0;
-  border-radius:12px;
-  line-height:1.8;
+padding:12px 14px;
+margin:9px 0;
+border-radius:14px;
+line-height:1.9;
+white-space:pre-wrap;
+word-wrap:break-word;
 }
-.user{background:#263a63}
-.ai{background:#202020}
+
+.user{
+background:#263a63;
+margin-right:30px;
+}
+
+.ai{
+background:#202020;
+margin-left:30px;
+}
+
 .bottom{
-  display:flex;
-  gap:8px;
-  padding:12px;
-  background:#151515;
+display:flex;
+gap:8px;
+padding:12px;
+background:#151515;
 }
+
 input{
-  flex:1;
-  padding:14px;
-  border:0;
-  border-radius:10px;
-  font-size:16px;
+flex:1;
+padding:14px;
+border:0;
+outline:none;
+border-radius:10px;
+font-size:16px;
 }
+
 button{
-  border:0;
-  border-radius:10px;
-  padding:0 18px;
-  font-size:18px;
+border:0;
+border-radius:10px;
+padding:0 17px;
+font-size:18px;
+cursor:pointer;
+}
+
+.clear{
+margin:0 12px 10px;
+padding:10px;
+background:#252525;
+color:white;
+}
+
+button:disabled{
+opacity:.5;
 }
 </style>
 </head>
@@ -69,12 +106,32 @@ button{
 </header>
 
 <div id="chat">
-<div class="msg ai">سلام وحید 👋<br>من Vahid AI هستم.<br>هر چیزی خواستی بپرس.</div>
+
+<div class="msg ai">
+سلام وحید 👋
+<br>
+من Vahid AI هستم.
+<br>
+هر چیزی خواستی بپرس.
 </div>
 
+</div>
+
+<button class="clear" onclick="clearChat()">
+🗑️ پاک کردن گفتگو
+</button>
+
 <div class="bottom">
-<input id="msg" placeholder="پیامت رو بنویس...">
-<button onclick="send()">➤</button>
+
+<input
+id="msg"
+placeholder="پیامت رو بنویس..."
+autocomplete="off">
+
+<button id="sendBtn" onclick="send()">
+➤
+</button>
+
 </div>
 
 </div>
@@ -82,64 +139,17 @@ button{
 <script>
 
 const API =
-"https://script.google.com/macros/s/AKfycbzm4_7oNgxKWkWrf5yp2G7lhrWJNx5-80BONFJAbAc0FxsN26Mr6zu-_ZWek5a3uUQl/exec";
+"https://script.google.com/macros/s/AKfycbyOb8sl_FIpXqHRKMT1vhmGH-igRbqoT6FZiMwknrbpzuJTtCwkTRuPxb0DojLkGrkC/exec";
 
-async function send(){
+const input = document.getElementById("msg");
+const chat = document.getElementById("chat");
+const sendBtn = document.getElementById("sendBtn");
 
-const input=document.getElementById("msg");
-const chat=document.getElementById("chat");
-const message=input.value.trim();
+function addMessage(type,text){
 
-if(!message)return;
+const div = document.createElement("div");
 
-chat.innerHTML+=
-`<div class="msg user">👤 ${message}</div>`;
+div.className = "msg " + type;
 
-input.value="";
-
-const loading=document.createElement("div");
-loading.className="msg ai";
-loading.textContent="🤖 در حال فکر کردن...";
-chat.appendChild(loading);
-
-try{
-
-const response=await fetch(API,{
-method:"POST",
-headers:{
-"Content-Type":"text/plain;charset=utf-8"
-},
-body:JSON.stringify({
-message:message
-})
-});
-
-const text=await response.text();
-
-loading.remove();
-
-let data=JSON.parse(text);
-
-chat.innerHTML+=
-`<div class="msg ai">🤖 ${data.reply || data.message || "پاسخی دریافت نشد."}</div>`;
-
-}catch(error){
-
-loading.textContent="❌ ارتباط با سرور برقرار نشد.";
-
-console.log(error);
-
-}
-
-chat.scrollTop=chat.scrollHeight;
-
-}
-
-document.getElementById("msg").addEventListener("keydown",function(e){
-if(e.key==="Enter") send();
-});
-
-</script>
-
-</body>
-</html>
+div.textContent =
+(type === "user" ?
