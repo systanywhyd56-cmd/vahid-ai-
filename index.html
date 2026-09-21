@@ -1,38 +1,145 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vahid AI</title>
+
+<style>
+body{
+  margin:0;
+  background:#080808;
+  color:white;
+  font-family:Tahoma,Arial;
+}
+.app{
+  max-width:600px;
+  height:100vh;
+  margin:auto;
+  display:flex;
+  flex-direction:column;
+}
+header{
+  padding:18px;
+  text-align:center;
+  background:#151515;
+}
+#chat{
+  flex:1;
+  overflow:auto;
+  padding:15px;
+}
+.msg{
+  padding:12px;
+  margin:8px 0;
+  border-radius:12px;
+  line-height:1.8;
+}
+.user{background:#263a63}
+.ai{background:#202020}
+.bottom{
+  display:flex;
+  gap:8px;
+  padding:12px;
+  background:#151515;
+}
+input{
+  flex:1;
+  padding:14px;
+  border:0;
+  border-radius:10px;
+  font-size:16px;
+}
+button{
+  border:0;
+  border-radius:10px;
+  padding:0 18px;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+<h2>🤖 Vahid AI</h2>
+<div>دستیار هوش مصنوعی وحید</div>
+</header>
+
+<div id="chat">
+<div class="msg ai">سلام وحید 👋<br>من Vahid AI هستم.<br>هر چیزی خواستی بپرس.</div>
+</div>
+
+<div class="bottom">
+<input id="msg" placeholder="پیامت رو بنویس...">
+<button onclick="send()">➤</button>
+</div>
+
+</div>
+
 <script>
-const API="https://script.google.com/macros/s/AKfycbzm4_7oNgxKWkWrf5yp2G7lhrWJNx5-80BONFJAbAc0FxsN26Mr6zu-_ZWek5a3uUQl/exec";
+
+const API =
+"https://script.google.com/macros/s/AKfycbzm4_7oNgxKWkWrf5yp2G7lhrWJNx5-80BONFJAbAc0FxsN26Mr6zu-_ZWek5a3uUQl/exec";
 
 async function send(){
- const input=document.getElementById("msg");
- const chat=document.getElementById("chat");
- const message=input.value.trim();
- if(!message)return;
 
- chat.innerHTML+=`<div class="msg">👤 ${message}</div>`;
- input.value="";
- chat.innerHTML+=`<div id="loading" class="msg">🤖 در حال فکر کردن...</div>`;
+const input=document.getElementById("msg");
+const chat=document.getElementById("chat");
+const message=input.value.trim();
 
- try{
-  const r=await fetch(API,{
-   method:"POST",
-   headers:{"Content-Type":"text/plain;charset=utf-8"},
-   body:JSON.stringify({message:message})
-  });
+if(!message)return;
 
-  const text=await r.text();
-  document.getElementById("loading").remove();
+chat.innerHTML+=
+`<div class="msg user">👤 ${message}</div>`;
 
-  let data;
-  try{
-   data=JSON.parse(text);
-  }catch{
-   throw new Error("پاسخ نامعتبر از سرور");
-  }
+input.value="";
 
-  chat.innerHTML+=`<div class="msg">🤖 ${data.reply || data.message || "پاسخی دریافت نشد."}</div>`;
+const loading=document.createElement("div");
+loading.className="msg ai";
+loading.textContent="🤖 در حال فکر کردن...";
+chat.appendChild(loading);
 
- }catch(e){
-  document.getElementById("loading").innerText="❌ ارتباط با سرور برقرار نشد.";
-  console.log(e);
- }
+try{
+
+const response=await fetch(API,{
+method:"POST",
+headers:{
+"Content-Type":"text/plain;charset=utf-8"
+},
+body:JSON.stringify({
+message:message
+})
+});
+
+const text=await response.text();
+
+loading.remove();
+
+let data=JSON.parse(text);
+
+chat.innerHTML+=
+`<div class="msg ai">🤖 ${data.reply || data.message || "پاسخی دریافت نشد."}</div>`;
+
+}catch(error){
+
+loading.textContent="❌ ارتباط با سرور برقرار نشد.";
+
+console.log(error);
+
 }
+
+chat.scrollTop=chat.scrollHeight;
+
+}
+
+document.getElementById("msg").addEventListener("keydown",function(e){
+if(e.key==="Enter") send();
+});
+
 </script>
+
+</body>
+</html>
