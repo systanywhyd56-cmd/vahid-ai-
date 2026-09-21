@@ -282,3 +282,26 @@ loadChat();
 
 </body>
 </html>
+function getMemory() {
+  const saved = PropertiesService
+    .getScriptProperties()
+    .getProperty(MEMORY_KEY);
+
+  if (saved) {
+    return JSON.parse(saved);
+  }
+
+  const memory = {
+    name: MEMORY_DEFAULT,
+    facts: [],
+    interests: [],
+    preferences: [],
+    projects: []
+  };
+
+  PropertiesService
+    .getScriptProperties()
+    .setProperty(MEMORY_KEY, JSON.stringify(memory));
+
+  return memory;
+}
