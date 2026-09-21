@@ -305,3 +305,28 @@ function getMemory() {
 
   return memory;
 }
+function saveMemory(text) {
+  const memory = getMemory();
+
+  if (!text) return;
+
+  if (text.includes("اسم من")) {
+    memory.facts.push(text);
+  }
+
+  if (text.includes("دوست دارم")) {
+    memory.interests.push(text);
+  }
+
+  if (text.includes("ترجیح میدم") || text.includes("ترجیح می‌دم")) {
+    memory.preferences.push(text);
+  }
+
+  if (text.includes("پروژه")) {
+    memory.projects.push(text);
+  }
+
+  PropertiesService
+    .getScriptProperties()
+    .setProperty(MEMORY_KEY, JSON.stringify(memory));
+}
