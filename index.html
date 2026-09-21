@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Vahid AI</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
 background:#080808;
-color:#fff;
+color:white;
 font-family:Tahoma,Arial;
 }
 
 .app{
+width:100%;
 max-width:650px;
 height:100vh;
 margin:auto;
@@ -30,11 +36,13 @@ background:#151515;
 border-bottom:1px solid #292929;
 }
 
-header h2{margin:0 0 6px}
+header h2{
+margin:0 0 7px;
+}
 
 #chat{
 flex:1;
-overflow:auto;
+overflow-y:auto;
 padding:15px;
 }
 
@@ -44,7 +52,7 @@ margin:9px 0;
 border-radius:14px;
 line-height:1.9;
 white-space:pre-wrap;
-word-wrap:break-word;
+word-break:break-word;
 }
 
 .user{
@@ -71,12 +79,19 @@ border:0;
 outline:none;
 border-radius:10px;
 font-size:16px;
+background:white;
+color:black;
+}
+
+.send{
+background:#fff;
+color:#000;
 }
 
 button{
 border:0;
 border-radius:10px;
-padding:0 17px;
+padding:0 18px;
 font-size:18px;
 cursor:pointer;
 }
@@ -87,6 +102,11 @@ padding:10px;
 background:#252525;
 color:white;
 }
+
+button:disabled{
+opacity:.5;
+}
+
 </style>
 </head>
 
@@ -95,8 +115,13 @@ color:white;
 <div class="app">
 
 <header>
+
 <h2>🤖 Vahid AI</h2>
-<div>دستیار هوش مصنوعی وحید</div>
+
+<div>
+دستیار هوش مصنوعی وحید
+</div>
+
 </header>
 
 <div id="chat"></div>
@@ -107,9 +132,18 @@ color:white;
 
 <div class="bottom">
 
-<input id="msg" placeholder="پیامت رو بنویس..." autocomplete="off">
+<input
+id="msg"
+type="text"
+placeholder="پیامت رو بنویس..."
+autocomplete="off">
 
-<button id="sendBtn" onclick="send()">➤</button>
+<button
+class="send"
+id="sendBtn"
+onclick="sendMessage()">
+➤
+</button>
 
 </div>
 
@@ -120,17 +154,33 @@ color:white;
 const API =
 "https://script.google.com/macros/s/AKfycbyOb8sl_FIpXqHRKMT1vhmGH-igRbqoT6FZiMwknrbpzuJTtCwkTRuPxb0DojLkGrkC/exec";
 
-const input = document.getElementById("msg");
-const chat = document.getElementById("chat");
-const sendBtn = document.getElementById("sendBtn");
+const STORAGE =
+"vahid_ai_history";
 
-const STORAGE_KEY = "vahid_ai_chat";
+const input =
+document.getElementById("msg");
+
+const chat =
+document.getElementById("chat");
+
+const sendBtn =
+document.getElementById("sendBtn");
 
 
-// نمایش تاریخچه ذخیره شده
-function loadChat(){
+function saveLocal(){
 
-const saved = localStorage.getItem(STORAGE_KEY);
+localStorage.setItem(
+STORAGE,
+chat.innerHTML
+);
+
+}
+
+
+function loadLocal(){
+
+const saved =
+localStorage.getItem(STORAGE);
 
 if(saved){
 
@@ -150,183 +200,171 @@ chat.innerHTML = `
 
 }
 
-chat.scrollTop = chat.scrollHeight;
+chat.scrollTop =
+chat.scrollHeight;
 
 }
 
 
-// ذخیره تاریخچه
-function saveChat(){
-
-localStorage.setItem(
-STORAGE_KEY,
-chat.innerHTML
-);
-
-}
-
-
-// اضافه کردن پیام
 function addMessage(type,text){
 
-const div = document.createElement("div");
+const div =
+document.createElement("div");
 
-div.className = "msg " + type;
+div.className =
+"msg " + type;
 
 div.textContent =
-(type === "user" ? "👤 " : "🤖 ") + text;
+(type === "user" ? "👤 " : "🤖 ")
++ text;
 
 chat.appendChild(div);
 
-saveChat();
+saveLocal();
 
-chat.scrollTop = chat.scrollHeight;
+chat.scrollTop =
+chat.scrollHeight;
 
 }
 
 
-// ارسال پیام
-async function send(){
+async function sendMessage(){
 
-const message = input.value.trim();
+const message =
+input.value.trim();
 
-if(!message)return;
+if(!message){
+return;
+}
 
-addMessage("user",message);
+addMessage(
+"user",
+message
+);
 
-input.value="";
+input.value = "";
 
-sendBtn.disabled=true;
+sendBtn.disabled = true;
 
-const loading=document.createElement("div");
 
-loading.className="msg ai";
+const loading =
+document.createElement("div");
 
-loading.textContent="🤖 در حال فکر کردن...";
+loading.className =
+"msg ai";
+
+loading.textContent =
+"🤖 در حال فکر کردن...";
 
 chat.appendChild(loading);
 
+chat.scrollTop =
+chat.scrollHeight;
+
+
 try{
 
-const response = await fetch(
-API + "?message=" + encodeURIComponent(message)
+const url =
+API +
+"?message=" +
+encodeURIComponent(message);
+
+
+const response =
+await fetch(url);
+
+
+if(!response.ok){
+
+throw new Error(
+"HTTP " +
+response.status
 );
 
-const data = await response.json();
+}
+
+
+const data =
+await response.json();
+
 
 loading.remove();
 
+
 if(data.ok){
 
-addMessage("ai",data.reply);
+addMessage(
+"ai",
+data.reply
+);
 
 }else{
 
 addMessage(
 "ai",
-data.reply || "خطایی رخ داد."
+data.reply ||
+"خطایی رخ داد."
 );
 
 }
+
 
 }catch(error){
 
 loading.textContent =
 "❌ ارتباط با سرور برقرار نشد.";
 
-saveChat();
+saveLocal();
 
-}
-
-sendBtn.disabled=false;
-
-chat.scrollTop=chat.scrollHeight;
+console.error(error);
 
 }
 
 
-// پاک کردن تاریخچه
+sendBtn.disabled = false;
+
+input.focus();
+
+}
+
+
 function clearChat(){
 
-localStorage.removeItem(STORAGE_KEY);
+localStorage.removeItem(STORAGE);
 
-chat.innerHTML=`
+chat.innerHTML = `
 <div class="msg ai">
 سلام وحید 👋
-<br>
-من Vahid AI هستم.
 <br>
 گفتگوی جدید شروع شد.
 </div>
 `;
 
-saveChat();
+saveLocal();
 
 }
 
 
-// Enter
-input.addEventListener("keydown",function(e){
+input.addEventListener(
+"keydown",
+function(event){
 
-if(e.key==="Enter"){
-send();
+if(event.key === "Enter"){
+
+event.preventDefault();
+
+sendMessage();
+
 }
 
 });
 
 
-// شروع برنامه
-loadChat();
+loadLocal();
+
+input.focus();
 
 </script>
 
 </body>
-</html>
-function getMemory() {
-  const saved = PropertiesService
-    .getScriptProperties()
-    .getProperty(MEMORY_KEY);
-
-  if (saved) {
-    return JSON.parse(saved);
-  }
-
-  const memory = {
-    name: MEMORY_DEFAULT,
-    facts: [],
-    interests: [],
-    preferences: [],
-    projects: []
-  };
-
-  PropertiesService
-    .getScriptProperties()
-    .setProperty(MEMORY_KEY, JSON.stringify(memory));
-
-  return memory;
-}
-function saveMemory(text) {
-  const memory = getMemory();
-
-  if (!text) return;
-
-  if (text.includes("اسم من")) {
-    memory.facts.push(text);
-  }
-
-  if (text.includes("دوست دارم")) {
-    memory.interests.push(text);
-  }
-
-  if (text.includes("ترجیح میدم") || text.includes("ترجیح می‌دم")) {
-    memory.preferences.push(text);
-  }
-
-  if (text.includes("پروژه")) {
-    memory.projects.push(text);
-  }
-
-  PropertiesService
-    .getScriptProperties()
-    .setProperty(MEMORY_KEY, JSON.stringify(memory));
-}
+  </html>
