@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Vahid AI</title>
 
 <style>
@@ -82,8 +84,8 @@ header p{
 }
 
 .imageBox img{
-  width:100%;
   display:block;
+  width:100%;
   border-radius:12px;
 }
 
@@ -91,16 +93,6 @@ header p{
   color:#aaa;
   font-size:13px;
   padding:7px 3px;
-}
-
-.clear{
-  margin:0 12px 10px;
-  padding:11px;
-  border:0;
-  border-radius:10px;
-  background:#252525;
-  color:#fff;
-  font-size:14px;
 }
 
 .bottom{
@@ -122,23 +114,32 @@ input{
   color:#000;
 }
 
-#send{
-  width:55px;
+button{
   border:0;
   border-radius:10px;
+  cursor:pointer;
+}
+
+#send{
+  width:55px;
   background:#fff;
   color:#000;
   font-size:22px;
 }
 
-button{
-  cursor:pointer;
+#clear{
+  margin:0 12px 10px;
+  padding:11px;
+  background:#252525;
+  color:#fff;
+  font-size:14px;
 }
 
 button:disabled{
   opacity:.5;
 }
 </style>
+
 </head>
 
 <body>
@@ -152,7 +153,7 @@ button:disabled{
 
 <div id="chat"></div>
 
-<button class="clear" id="clear">
+<button id="clear">
 🗑️ پاک کردن گفتگو
 </button>
 
@@ -164,7 +165,9 @@ button:disabled{
   placeholder="پیامت رو بنویس..."
   autocomplete="off">
 
-<button id="send">➤</button>
+<button id="send">
+➤
+</button>
 
 </div>
 
@@ -173,7 +176,7 @@ button:disabled{
 <script>
 
 /* =========================
-   آدرس سرور Vahid AI
+   سرور سالم Vahid AI
 ========================= */
 
 const API =
@@ -198,7 +201,7 @@ document.getElementById("clear");
 
 
 /* =========================
-   اضافه کردن پیام
+   پیام
 ========================= */
 
 function addMessage(type,text){
@@ -218,14 +221,16 @@ function addMessage(type,text){
 
   chat.scrollTop =
   chat.scrollHeight;
+
+  return div;
 }
 
 
 /* =========================
-   تشخیص درخواست عکس
+   تشخیص عکس
 ========================= */
 
-function wantsImage(text){
+function isImageRequest(text){
 
   const t =
   text.toLowerCase();
@@ -246,16 +251,17 @@ function wantsImage(text){
 
 
 /* =========================
-   ساخت تصویر
+   ساخت عکس
 ========================= */
 
-function showImage(prompt){
+function createImage(prompt){
 
   const box =
   document.createElement("div");
 
   box.className =
   "imageBox";
+
 
   const title =
   document.createElement("div");
@@ -266,18 +272,19 @@ function showImage(prompt){
   title.textContent =
   "🎨 در حال ساخت تصویر...";
 
+
   const img =
   document.createElement("img");
 
 
-  const imageUrl =
+  const url =
   "https://image.pollinations.ai/prompt/"
   + encodeURIComponent(prompt)
   + "?width=1024&height=1024&nologo=true";
 
 
   img.src =
-  imageUrl;
+  url;
 
   img.alt =
   prompt;
@@ -296,7 +303,7 @@ function showImage(prompt){
   function(){
 
     title.textContent =
-    "❌ تصویر ساخته نشد.";
+    "❌ ساخت تصویر انجام نشد.";
 
   };
 
@@ -313,72 +320,48 @@ function showImage(prompt){
 
 
 /* =========================
-   ارسال پیام
+   ارسال پیام به سرور
 ========================= */
 
-async function sendMessage(){
+async function askServer(message){
 
-  const text =
-  input.value.trim();
-
-  if(!text){
-    return;
-  }
+  const url =
+  API +
+  "?message=" +
+  encodeURIComponent(message);
 
 
-  addMessage(
-    "user",
-    text
-  );
+  /*
+     جلوگیری از گیر کردن دائمی
+  */
+
+  const controller =
+  new AbortController();
 
 
-  input.value = "";
+  const timeout =
+  setTimeout(function(){
 
-  send.disabled = true;
+    controller.abort();
 
-
-  /* درخواست تصویر */
-
-  if(wantsImage(text)){
-
-    const loading =
-    addMessage(
-      "ai",
-      "🎨 در حال ساخت تصویر..."
-    );
-
-
-    showImage(text);
-
-    loading.remove();
-
-    send.disabled = false;
-
-    input.focus();
-
-    return;
-  }
-
-
-  /* درخواست معمولی */
-
-  const loading =
-  addMessage(
-    "ai",
-    "در حال فکر کردن..."
-  );
+  },30000);
 
 
   try{
 
-    const url =
-    API +
-    "?message=" +
-    encodeURIComponent(text);
-
-
     const response =
-    await fetch(url);
+    await fetch(
+      url,
+      {
+        method:"GET",
+        mode:"cors",
+        cache:"no-store",
+        signal:controller.signal
+      }
+    );
+
+
+    clearTimeout(timeout);
 
 
     if(!response.ok){
@@ -391,8 +374,101 @@ async function sendMessage(){
     }
 
 
+    const text =
+    await response.text();
+
+
+    if(!text){
+
+      throw new Error(
+        "پاسخ خالی است"
+      );
+
+    }
+
+
+    return JSON.parse(text);
+
+
+  }catch(error){
+
+    clearTimeout(timeout);
+
+    throw error;
+
+  }
+
+}
+
+
+/* =========================
+   ارسال
+========================= */
+
+async function sendMessage(){
+
+  const message =
+  input.value.trim();
+
+
+  if(!message){
+
+    return;
+
+  }
+
+
+  addMessage(
+    "user",
+    message
+  );
+
+
+  input.value = "";
+
+  send.disabled = true;
+
+
+  /* =====================
+     درخواست عکس
+  ===================== */
+
+  if(isImageRequest(message)){
+
+    const loading =
+    addMessage(
+      "ai",
+      "🎨 در حال ساخت تصویر..."
+    );
+
+
+    createImage(message);
+
+    loading.remove();
+
+    send.disabled = false;
+
+    input.focus();
+
+    return;
+  }
+
+
+  /* =====================
+     درخواست متن
+  ===================== */
+
+  const loading =
+  addMessage(
+    "ai",
+    "در حال فکر کردن..."
+  );
+
+
+  try{
+
     const data =
-    await response.json();
+    await askServer(message);
 
 
     loading.remove();
@@ -411,7 +487,7 @@ async function sendMessage(){
       addMessage(
         "ai",
         data.reply ||
-        "خطایی رخ داد."
+        "سرور خطا برگرداند."
       );
 
     }
@@ -421,10 +497,12 @@ async function sendMessage(){
 
     loading.remove();
 
+
     addMessage(
       "ai",
-      "❌ ارتباط با سرور برقرار نشد."
+      "❌ اتصال صفحه به سرور برقرار نشد.\n\nاگر سرور را مستقیم باز می‌کنی و جواب می‌دهد، مشکل از محدودیت CORS مرورگر است."
     );
+
 
     console.error(error);
 
@@ -438,7 +516,7 @@ async function sendMessage(){
 
 
 /* =========================
-   پاک کردن گفتگو
+   پاک کردن
 ========================= */
 
 clear.onclick =
@@ -448,7 +526,7 @@ function(){
 
   addMessage(
     "ai",
-    "سلام وحید 👋\nمن Vahid AI هستم."
+    "سلام وحید 👋\nگفتگوی جدید شروع شد."
   );
 
 };
@@ -463,7 +541,7 @@ sendMessage;
 
 
 /* =========================
-   ارسال با Enter
+   Enter
 ========================= */
 
 input.addEventListener(
@@ -483,12 +561,12 @@ input.addEventListener(
 
 
 /* =========================
-   پیام شروع
+   شروع
 ========================= */
 
 addMessage(
   "ai",
-  "سلام وحید 👋\nمن Vahid AI هستم.\nبرای ساخت عکس بنویس: «یک گرگ سیاه در برف بساز»"
+  "سلام وحید 👋\nمن Vahid AI هستم.\nهر چیزی خواستی بپرس."
 );
 
 input.focus();
