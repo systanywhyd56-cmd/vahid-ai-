@@ -4,10 +4,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Vahid AI</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
@@ -18,12 +22,11 @@ font-family:Tahoma,Arial,sans-serif;
 
 .app{
 width:100%;
-max-width:720px;
+max-width:650px;
 height:100vh;
 margin:auto;
 display:flex;
 flex-direction:column;
-background:#080808;
 }
 
 header{
@@ -33,11 +36,8 @@ background:#151515;
 border-bottom:1px solid #292929;
 }
 
-header h2{margin:0 0 6px}
-
-.status{
-font-size:13px;
-color:#65d98b;
+header h2{
+margin:0 0 7px;
 }
 
 #chat{
@@ -49,8 +49,9 @@ padding:15px;
 .msg{
 padding:12px 14px;
 margin:9px 0;
-border-radius:15px;
-line-height:2;
+border-radius:14px;
+line-height:1.9;
+white-space:pre-wrap;
 word-break:break-word;
 }
 
@@ -64,110 +65,69 @@ background:#202020;
 margin-left:30px;
 }
 
-.ai-text{
-white-space:pre-wrap;
+.image-box{
+margin:12px 0;
+padding:8px;
+background:#151515;
+border-radius:16px;
 }
 
-.chat-image{
-display:block;
+.image-box img{
 width:100%;
-max-width:650px;
-margin:10px 0;
-border-radius:15px;
-background:#111;
+display:block;
+border-radius:12px;
 }
 
-.image-buttons{
-display:flex;
-gap:7px;
-margin-top:8px;
-}
-
-.image-buttons a{
-padding:7px 10px;
-background:#333;
-color:#fff;
-border-radius:8px;
-text-decoration:none;
-font-size:12px;
-}
-
-.speak{
-margin-top:8px;
-padding:6px 10px;
-background:#333;
-color:#fff;
-font-size:12px;
+.image-title{
+padding:8px 4px;
+color:#aaa;
+font-size:13px;
 }
 
 .bottom{
 display:flex;
-gap:7px;
-padding:10px;
+gap:8px;
+padding:12px;
 background:#151515;
 }
 
 input{
 flex:1;
-min-width:0;
 padding:14px;
 border:0;
 outline:none;
 border-radius:10px;
 font-size:16px;
+background:#fff;
+color:#000;
+}
+
+.send{
+background:#fff;
+color:#000;
 }
 
 button{
 border:0;
 border-radius:10px;
+padding:0 18px;
+font-size:18px;
 cursor:pointer;
 }
 
-.send{
-width:55px;
-background:#fff;
-color:#000;
-font-size:18px;
-}
-
-.voice,.image{
-width:50px;
-background:#292929;
-color:#fff;
-font-size:18px;
-}
-
 .clear{
-margin:0 10px 10px;
-padding:11px;
+margin:0 12px 10px;
+padding:10px;
 background:#252525;
 color:#fff;
-width:calc(100% - 20px);
 }
 
-.loading{color:#aaa}
-.error{color:#ff7070}
-
-#imagePreview{
-display:none;
-padding:10px;
-background:#151515;
-text-align:center;
+button:disabled{
+opacity:.5;
 }
 
-#preview{
-max-width:150px;
-max-height:150px;
-border-radius:10px;
-}
-
-.removeImage{
-margin-top:6px;
-padding:6px 10px;
-background:#333;
-color:#fff;
-}
 </style>
+
 </head>
 
 <body>
@@ -175,73 +135,84 @@ color:#fff;
 <div class="app">
 
 <header>
+
 <h2>🤖 Vahid AI</h2>
-<div>دستیار هوش مصنوعی وحید</div>
-<div class="status">🟢 Online</div>
+
+<div>
+دستیار هوش مصنوعی وحید
+</div>
+
 </header>
+
 
 <div id="chat"></div>
 
-<div id="imagePreview">
-<img id="preview">
-<br>
-<button class="removeImage" onclick="removeImage()">حذف عکس</button>
-</div>
 
-<button class="clear" onclick="clearChat()">
+<button
+class="clear"
+onclick="clearChat()">
+
 🗑️ پاک کردن گفتگو
+
 </button>
 
-<div class="bottom">
 
-<button class="image" onclick="chooseImage()">🖼️</button>
+<div class="bottom">
 
 <input
 id="msg"
 type="text"
 placeholder="پیامت رو بنویس..."
-autocomplete="off"
->
+autocomplete="off">
 
-<button class="voice" id="voiceBtn" onclick="startVoice()">
-🎤
-</button>
+<button
+class="send"
+id="sendBtn"
+onclick="sendMessage()">
 
-<button class="send" id="sendBtn" onclick="sendMessage()">
 ➤
+
 </button>
 
 </div>
 
-<input
-id="imageInput"
-type="file"
-accept="image/*"
-style="display:none"
->
-
 </div>
+
 
 <script>
 
 /* =========================
-   اتصال Vahid AI
+   سرور Vahid AI
 ========================= */
 
 const API =
 "https://script.google.com/macros/s/AKfycbx3iXj2yaogGSgFyt1HlPnxLrK7TjjLSigrr6j1nFmusdPY7DXHCntRksdbXcK_c0zG/exec";
 
-const STORAGE = "vahid_ai_history";
 
-const input = document.getElementById("msg");
-const chat = document.getElementById("chat");
-const sendBtn = document.getElementById("sendBtn");
-const voiceBtn = document.getElementById("voiceBtn");
-const imageInput = document.getElementById("imageInput");
-const imagePreview = document.getElementById("imagePreview");
-const preview = document.getElementById("preview");
+/* =========================
+   موتور ساخت تصویر
+========================= */
 
-let selectedImage = null;
+const IMAGE_API =
+"https://image.pollinations.ai/prompt/";
+
+
+/* =========================
+   حافظه محلی
+========================= */
+
+const STORAGE =
+"vahid_ai_history";
+
+
+const input =
+document.getElementById("msg");
+
+const chat =
+document.getElementById("chat");
+
+const sendBtn =
+document.getElementById("sendBtn");
 
 
 /* =========================
@@ -249,7 +220,12 @@ let selectedImage = null;
 ========================= */
 
 function saveLocal(){
-localStorage.setItem(STORAGE, chat.innerHTML);
+
+localStorage.setItem(
+STORAGE,
+chat.innerHTML
+);
+
 }
 
 
@@ -259,175 +235,38 @@ localStorage.setItem(STORAGE, chat.innerHTML);
 
 function loadLocal(){
 
-const saved = localStorage.getItem(STORAGE);
+const saved =
+localStorage.getItem(STORAGE);
 
 if(saved){
 
-chat.innerHTML = saved;
+chat.innerHTML =
+saved;
 
 }else{
 
 chat.innerHTML = `
+
 <div class="msg ai">
-<div class="ai-text">
+
 سلام وحید 👋
+
 <br>
+
 من Vahid AI هستم.
+
 <br>
+
 هر چیزی خواستی بپرس.
-<br><br>
-برای عکس هم می‌توانی بگویی:
-<br>
-«یک گرگ سیاه در برف بساز»
+
 </div>
-</div>
+
 `;
 
 }
 
-chat.scrollTop = chat.scrollHeight;
-
-}
-
-
-/* =========================
-   تبدیل Markdown عکس به عکس واقعی
-========================= */
-
-function renderAIText(text){
-
-const container = document.createElement("div");
-
-container.className = "ai-text";
-
-
-/*
-فرمت:
-![توضیح](URL)
-*/
-
-const imageRegex =
-/!([^]*)\](https?:\/\/[^)\s]+)/g;
-
-
-let lastIndex = 0;
-let match;
-
-
-while((match = imageRegex.exec(text)) !== null){
-
-/*
-متن قبل از عکس
-*/
-
-const before =
-text.substring(
-lastIndex,
-match.index
-);
-
-if(before){
-
-const textNode =
-document.createElement("span");
-
-textNode.textContent =
-before;
-
-container.appendChild(
-textNode
-);
-
-}
-
-
-/*
-ساخت تصویر
-*/
-
-const img =
-document.createElement("img");
-
-img.className =
-"chat-image";
-
-img.src =
-match[2];
-
-img.alt =
-match[1] || "Vahid AI image";
-
-img.loading =
-"lazy";
-
-
-container.appendChild(
-img
-);
-
-
-/*
-دکمه باز کردن تصویر
-*/
-
-const buttons =
-document.createElement("div");
-
-buttons.className =
-"image-buttons";
-
-
-const link =
-document.createElement("a");
-
-link.href =
-match[2];
-
-link.target =
-"_blank";
-
-link.textContent =
-"🔗 باز کردن تصویر";
-
-
-buttons.appendChild(
-link
-);
-
-container.appendChild(
-buttons
-);
-
-
-lastIndex =
-imageRegex.lastIndex;
-
-}
-
-
-/*
-متن باقی‌مانده
-*/
-
-const after =
-text.substring(lastIndex);
-
-if(after){
-
-const textNode =
-document.createElement("span");
-
-textNode.textContent =
-after;
-
-container.appendChild(
-textNode
-);
-
-}
-
-
-return container;
+chat.scrollTop =
+chat.scrollHeight;
 
 }
 
@@ -444,50 +283,11 @@ document.createElement("div");
 div.className =
 "msg " + type;
 
-
-if(type === "ai"){
-
-const content =
-renderAIText(text);
-
-div.appendChild(content);
-
-
-/*
-دکمه خواندن
-*/
-
-const speak =
-document.createElement("button");
-
-speak.className =
-"speak";
-
-speak.textContent =
-"🔊 خواندن پاسخ";
-
-speak.onclick =
-function(){
-speakText(text);
-};
-
-div.appendChild(speak);
-
-}else{
-
-const content =
-document.createElement("div");
-
-content.className =
-"ai-text";
-
-content.textContent =
-"👤 " + text;
-
-div.appendChild(content);
-
-}
-
+div.textContent =
+(type === "user"
+? "👤 "
+: "🤖 ")
++ text;
 
 chat.appendChild(div);
 
@@ -500,23 +300,385 @@ chat.scrollHeight;
 
 
 /* =========================
-   تشخیص درخواست تصویر
+   تشخیص درخواست عکس
 ========================= */
 
-function wantsImage(text){
+function isImageRequest(text){
 
 const t =
 text.toLowerCase();
 
-const words = [
+const commands = [
 
 "عکس بساز",
 "تصویر بساز",
 "عکس درست کن",
 "تصویر درست کن",
-"عکس ایجاد کن",
-"تصویر ایجاد کن",
 "عکس تولید کن",
 "تصویر تولید کن",
-"برام عکس بساز",
-"
+"عکس ایجاد کن",
+"تصویر ایجاد کن",
+"یه عکس",
+"یک عکس",
+"عکس از",
+"تصویر از",
+"تصویر",
+"عکس"
+
+];
+
+return commands.some(
+x => t.includes(x)
+);
+
+}
+
+
+/* =========================
+   ساخت عکس
+========================= */
+
+function createImage(prompt){
+
+const box =
+document.createElement("div");
+
+box.className =
+"image-box";
+
+
+const img =
+document.createElement("img");
+
+
+const title =
+document.createElement("div");
+
+title.className =
+"image-title";
+
+title.textContent =
+"🎨 تصویر در حال ساخته‌شدن است...";
+
+
+let cleanPrompt =
+prompt;
+
+
+/* حذف عبارت‌های ابتدایی */
+
+const removeWords = [
+
+"عکس بساز",
+"تصویر بساز",
+"عکس درست کن",
+"تصویر درست کن",
+"عکس تولید کن",
+"تصویر تولید کن",
+"عکس ایجاد کن",
+"تصویر ایجاد کن",
+"یه عکس",
+"یک عکس",
+"عکس از",
+"تصویر از"
+
+];
+
+
+removeWords.forEach(
+word => {
+
+cleanPrompt =
+cleanPrompt.replace(
+word,
+""
+);
+
+}
+);
+
+
+cleanPrompt =
+cleanPrompt.trim();
+
+
+if(!cleanPrompt){
+
+cleanPrompt =
+prompt;
+
+}
+
+
+/* =========================
+   آدرس تصویر
+========================= */
+
+const imageUrl =
+IMAGE_API +
+encodeURIComponent(cleanPrompt);
+
+
+/* تصویر */
+
+img.src =
+imageUrl;
+
+img.alt =
+cleanPrompt;
+
+img.loading =
+"lazy";
+
+
+/* وقتی عکس آمد */
+
+img.onload =
+function(){
+
+title.textContent =
+"🎨 تصویر ساخته‌شده توسط Vahid AI";
+
+};
+
+
+/* اگر خطا شد */
+
+img.onerror =
+function(){
+
+title.textContent =
+"❌ ساخت تصویر انجام نشد. دوباره امتحان کن.";
+
+};
+
+
+box.appendChild(img);
+
+box.appendChild(title);
+
+chat.appendChild(box);
+
+saveLocal();
+
+chat.scrollTop =
+chat.scrollHeight;
+
+}
+
+
+/* =========================
+   ارسال پیام
+========================= */
+
+async function sendMessage(){
+
+const message =
+input.value.trim();
+
+
+if(!message){
+
+return;
+
+}
+
+
+/* پیام کاربر */
+
+addMessage(
+"user",
+message
+);
+
+
+input.value = "";
+
+sendBtn.disabled =
+true;
+
+
+/* =========================
+   اگر درخواست عکس بود
+========================= */
+
+if(isImageRequest(message)){
+
+const loading =
+document.createElement("div");
+
+loading.className =
+"msg ai";
+
+loading.textContent =
+"🤖 در حال ساخت تصویر...";
+
+chat.appendChild(loading);
+
+chat.scrollTop =
+chat.scrollHeight;
+
+
+createImage(message);
+
+
+loading.remove();
+
+sendBtn.disabled =
+false;
+
+input.focus();
+
+return;
+
+}
+
+
+/* =========================
+   درخواست معمولی
+========================= */
+
+const loading =
+document.createElement("div");
+
+loading.className =
+"msg ai";
+
+loading.textContent =
+"🤖 در حال فکر کردن...";
+
+chat.appendChild(loading);
+
+chat.scrollTop =
+chat.scrollHeight;
+
+
+try{
+
+
+const url =
+API +
+"?message=" +
+encodeURIComponent(message);
+
+
+const response =
+await fetch(url);
+
+
+if(!response.ok){
+
+throw new Error(
+"HTTP " +
+response.status
+);
+
+}
+
+
+const data =
+await response.json();
+
+
+loading.remove();
+
+
+if(data.ok){
+
+addMessage(
+"ai",
+data.reply
+);
+
+}else{
+
+addMessage(
+"ai",
+data.reply ||
+"خطایی رخ داد."
+);
+
+}
+
+
+}catch(error){
+
+loading.textContent =
+"❌ ارتباط با سرور برقرار نشد.";
+
+saveLocal();
+
+console.error(error);
+
+}
+
+
+sendBtn.disabled =
+false;
+
+input.focus();
+
+}
+
+
+/* =========================
+   پاک کردن گفتگو
+========================= */
+
+function clearChat(){
+
+localStorage.removeItem(
+STORAGE
+);
+
+chat.innerHTML = `
+
+<div class="msg ai">
+
+سلام وحید 👋
+
+<br>
+
+گفتگوی جدید شروع شد.
+
+</div>
+
+`;
+
+saveLocal();
+
+}
+
+
+/* =========================
+   دکمه Enter
+========================= */
+
+input.addEventListener(
+"keydown",
+function(event){
+
+if(event.key === "Enter"){
+
+event.preventDefault();
+
+sendMessage();
+
+}
+
+});
+
+
+/* =========================
+   شروع برنامه
+========================= */
+
+loadLocal();
+
+input.focus();
+
+</script>
+
+</body>
+
+</html>
