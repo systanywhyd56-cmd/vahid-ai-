@@ -10,68 +10,341 @@
 <style>
 
 *{
-box-sizing:border-box;
+    box-sizing:border-box;
+}
+
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    background:#080808;
+    color:white;
+    font-family:Tahoma,Arial,sans-serif;
 }
 
 body{
-margin:0;
-background:#080808;
-color:white;
-font-family:Tahoma,Arial,sans-serif;
+    overflow:hidden;
 }
 
 .app{
-height:100vh;
-max-width:650px;
-margin:auto;
-display:flex;
-flex-direction:column;
+    width:100%;
+    max-width:650px;
+    height:100vh;
+    margin:auto;
+    display:flex;
+    flex-direction:column;
 }
 
 header{
-padding:18px;
-text-align:center;
-background:#151515;
-border-bottom:1px solid #292929;
+    flex:none;
+    padding:18px;
+    text-align:center;
+    background:#151515;
+    border-bottom:1px solid #292929;
 }
 
 header h2{
-margin:0 0 6px;
+    margin:0 0 6px;
+    font-size:22px;
+}
+
+header div{
+    color:#aaa;
 }
 
 #chat{
-flex:1;
-overflow-y:auto;
-padding:15px;
+    flex:1;
+    overflow-y:auto;
+    padding:15px;
 }
 
 .msg{
-padding:12px 15px;
-margin:10px 0;
-border-radius:14px;
-line-height:1.9;
-white-space:pre-wrap;
-word-wrap:break-word;
+    padding:12px 15px;
+    margin:10px 0;
+    border-radius:14px;
+    line-height:1.9;
+    white-space:pre-wrap;
+    word-break:break-word;
 }
 
 .user{
-background:#263a63;
-margin-right:35px;
+    background:#263a63;
+    margin-right:30px;
 }
 
 .ai{
-background:#202020;
-margin-left:35px;
+    background:#202020;
+    margin-left:30px;
+}
+
+.clear{
+    flex:none;
+    margin:0 12px 10px;
+    padding:12px;
+    border:0;
+    border-radius:10px;
+    background:#252525;
+    color:white;
+    font-size:15px;
 }
 
 .bottom{
-display:flex;
-gap:8px;
-padding:12px;
-background:#151515;
+    flex:none;
+    display:flex;
+    gap:8px;
+    padding:12px;
+    background:#151515;
 }
 
 input{
-flex:1;
-border:0;
-outline
+    flex:1;
+    min-width:0;
+    padding:14px;
+    border:0;
+    outline:none;
+    border-radius:10px;
+    font-size:16px;
+    background:white;
+    color:black;
+}
+
+.send{
+    width:55px;
+    border:0;
+    border-radius:10px;
+    background:white;
+    color:black;
+    font-size:22px;
+}
+
+button{
+    cursor:pointer;
+}
+
+button:disabled{
+    opacity:.5;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <h2>🤖 Vahid AI</h2>
+    <div>دستیار هوش مصنوعی وحید</div>
+</header>
+
+<div id="chat"></div>
+
+<button
+    class="clear"
+    id="clearButton">
+    🗑️ پاک کردن گفتگو
+</button>
+
+<div class="bottom">
+
+<input
+    id="message"
+    type="text"
+    placeholder="پیامت رو بنویس..."
+    autocomplete="off">
+
+<button
+    class="send"
+    id="sendButton">
+    ➤
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const API =
+"https://script.google.com/macros/s/AKfycbx3iXj2yaogGSgFyt1HlPnxLrK7TjjLSigrr6j1nFmusdPY7DXHCntRksdbXcK_c0zG/exec";
+
+
+const chat =
+document.getElementById("chat");
+
+const input =
+document.getElementById("message");
+
+const sendButton =
+document.getElementById("sendButton");
+
+const clearButton =
+document.getElementById("clearButton");
+
+
+function addMessage(type,text){
+
+    const div =
+    document.createElement("div");
+
+    div.className =
+    "msg " + type;
+
+    div.textContent =
+    (type === "user" ? "👤 " : "🤖 ")
+    + text;
+
+    chat.appendChild(div);
+
+    chat.scrollTop =
+    chat.scrollHeight;
+}
+
+
+function welcome(){
+
+    chat.innerHTML = "";
+
+    addMessage(
+        "ai",
+        "سلام وحید 👋\nمن Vahid AI هستم.\nهر چیزی خواستی بپرس."
+    );
+}
+
+
+async function sendMessage(){
+
+    const message =
+    input.value.trim();
+
+    if(message === ""){
+        return;
+    }
+
+    addMessage(
+        "user",
+        message
+    );
+
+    input.value = "";
+
+    sendButton.disabled = true;
+
+    const loading =
+    document.createElement("div");
+
+    loading.className =
+    "msg ai";
+
+    loading.textContent =
+    "🤖 در حال فکر کردن...";
+
+    chat.appendChild(loading);
+
+    chat.scrollTop =
+    chat.scrollHeight;
+
+
+    try{
+
+        const url =
+        API +
+        "?message=" +
+        encodeURIComponent(message);
+
+
+        const response =
+        await fetch(url);
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "HTTP " +
+                response.status
+            );
+        }
+
+
+        const data =
+        await response.json();
+
+
+        loading.remove();
+
+
+        if(data.ok){
+
+            addMessage(
+                "ai",
+                data.reply || "پاسخی دریافت نشد."
+            );
+
+        }else{
+
+            addMessage(
+                "ai",
+                data.reply || "خطایی در سرور رخ داد."
+            );
+
+        }
+
+
+    }catch(error){
+
+        loading.remove();
+
+        addMessage(
+            "ai",
+            "❌ ارتباط با سرور برقرار نشد."
+        );
+
+        console.log(error);
+
+    }
+
+
+    sendButton.disabled = false;
+
+    input.focus();
+}
+
+
+sendButton.addEventListener(
+    "click",
+    sendMessage
+);
+
+
+input.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "Enter"){
+
+            event.preventDefault();
+
+            sendMessage();
+
+        }
+
+    }
+);
+
+
+clearButton.addEventListener(
+    "click",
+    welcome
+);
+
+
+welcome();
+
+</script>
+
+</body>
+
+</html>
