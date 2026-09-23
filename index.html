@@ -1,32 +1,46 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<meta name="theme-color"
+content="#080808">
+
 <title>Vahid AI</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
 
 body{
-margin:0;
-background:#070707;
+height:100vh;
+background:#050505;
 color:#fff;
 font-family:Tahoma,Arial,sans-serif;
-height:100vh;
+overflow:hidden;
 }
 
 .app{
-max-width:700px;
 height:100vh;
+max-width:720px;
 margin:auto;
 display:flex;
 flex-direction:column;
-background:#0b0b0b;
+background:#090909;
 }
 
 header{
-padding:15px 18px;
+height:68px;
+padding:10px 15px;
 display:flex;
 align-items:center;
 justify-content:space-between;
@@ -34,121 +48,354 @@ background:#111;
 border-bottom:1px solid #292929;
 }
 
-.logo{
-font-size:25px;
+.brand{
 display:flex;
 align-items:center;
 gap:10px;
 }
 
-.logo small{
-font-size:11px;
-color:#777;
+.logo{
+width:43px;
+height:43px;
+border-radius:14px;
+background:#1c1c1c;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+border:1px solid #333;
+}
+
+.brand b{
+font-size:17px;
+}
+
+.brand small{
 display:block;
+font-size:10px;
+color:#777;
+margin-top:3px;
 }
 
 .status{
 font-size:11px;
-color:#65d681;
+color:#69d982;
 }
 
 #chat{
 flex:1;
-overflow:auto;
-padding:18px;
+overflow-y:auto;
+padding:18px 13px;
+scroll-behavior:smooth;
 }
 
-.msg{
-max-width:88%;
-padding:13px 16px;
-margin:10px 0;
-border-radius:17px;
-line-height:1.9;
-white-space:pre-wrap;
-word-break:break-word;
-animation:show .2s ease;
+#chat::-webkit-scrollbar{
+width:4px;
 }
 
-.user{
-margin-right:auto;
-background:#263d69;
-border-bottom-left-radius:5px;
-}
-
-.ai{
-margin-left:auto;
-background:#181818;
-border:1px solid #292929;
-border-bottom-right-radius:5px;
-}
-
-@keyframes show{
-from{opacity:0;transform:translateY(6px)}
-to{opacity:1;transform:translateY(0)}
+#chat::-webkit-scrollbar-thumb{
+background:#333;
+border-radius:20px;
 }
 
 .welcome{
 text-align:center;
-padding:55px 15px;
-color:#888;
+padding:50px 15px;
+color:#777;
+}
+
+.welcomeIcon{
+font-size:52px;
+margin-bottom:12px;
 }
 
 .welcome b{
 display:block;
-font-size:26px;
-color:white;
+font-size:25px;
+color:#fff;
 margin-bottom:10px;
 }
 
+.welcome p{
+font-size:13px;
+line-height:2;
+}
+
+.quick{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:7px;
+margin-top:20px;
+}
+
+.quick button{
+padding:9px 12px;
+border-radius:20px;
+border:1px solid #303030;
+background:#171717;
+color:#ccc;
+font-family:inherit;
+cursor:pointer;
+}
+
+.row{
+display:flex;
+margin:12px 0;
+animation:in .2s ease;
+}
+
+.row.user{
+justify-content:flex-start;
+}
+
+.row.ai{
+justify-content:flex-end;
+}
+
+.msg{
+max-width:88%;
+padding:13px 15px;
+border-radius:17px;
+line-height:1.9;
+font-size:14px;
+white-space:pre-wrap;
+word-break:break-word;
+}
+
+.user .msg{
+background:#263d69;
+border-bottom-left-radius:5px;
+}
+
+.ai .msg{
+background:#181818;
+border:1px solid #2b2b2b;
+border-bottom-right-radius:5px;
+}
+
+@keyframes in{
+from{
+opacity:0;
+transform:translateY(7px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.tools{
+display:flex;
+gap:5px;
+margin-top:8px;
+}
+
+.tools button{
+background:transparent;
+border:0;
+color:#999;
+font-size:11px;
+cursor:pointer;
+font-family:inherit;
+}
+
+.tools button:hover{
+color:#fff;
+}
+
+.typing{
+display:flex;
+gap:5px;
+align-items:center;
+}
+
+.typing i{
+width:7px;
+height:7px;
+border-radius:50%;
+background:#aaa;
+animation:dot 1s infinite;
+}
+
+.typing i:nth-child(2){
+animation-delay:.2s;
+}
+
+.typing i:nth-child(3){
+animation-delay:.4s;
+}
+
+@keyframes dot{
+0%,100%{
+opacity:.2;
+transform:translateY(0);
+}
+50%{
+opacity:1;
+transform:translateY(-4px);
+}
+}
+
+.actions{
+display:flex;
+gap:6px;
+padding:8px 10px;
+overflow-x:auto;
+background:#101010;
+border-top:1px solid #252525;
+}
+
+.actions button{
+white-space:nowrap;
+padding:8px 10px;
+border-radius:10px;
+background:#191919;
+color:#bbb;
+border:1px solid #2d2d2d;
+font-family:inherit;
+font-size:11px;
+cursor:pointer;
+}
+
+.actions button:hover{
+background:#252525;
+color:#fff;
+}
+
 .bottom{
-padding:12px;
+display:flex;
+gap:7px;
+padding:10px;
 background:#111;
 border-top:1px solid #292929;
-display:flex;
-gap:8px;
 }
 
-input{
+#msg{
 flex:1;
 min-width:0;
-padding:14px;
-border:1px solid #333;
+height:48px;
+padding:12px;
 border-radius:14px;
+border:1px solid #333;
 background:#191919;
-color:white;
+color:#fff;
 outline:none;
-font-size:15px;
+font-family:inherit;
+font-size:14px;
 }
 
-input:focus{
+#msg:focus{
 border-color:#555;
 }
 
-button{
+.icon{
+width:48px;
+height:48px;
 border:0;
-border-radius:13px;
+border-radius:14px;
+background:#242424;
+color:#ddd;
+font-size:18px;
 cursor:pointer;
 }
 
 #send{
-width:50px;
 background:#fff;
 color:#000;
-font-size:20px;
 }
 
-#clear{
-margin:0 12px 10px;
-padding:9px;
-background:#181818;
-color:#aaa;
-border:1px solid #292929;
+.footer{
+text-align:center;
+font-size:8px;
+color:#444;
+padding-bottom:5px;
 }
 
-button:disabled{
-opacity:.5;
+#imagePanel{
+display:none;
+max-height:350px;
+overflow:auto;
+padding:10px;
+background:#101010;
+border-top:1px solid #292929;
 }
+
+#imagePanelTitle{
+font-size:12px;
+color:#999;
+padding:5px;
+}
+
+body.light{
+background:#eee;
+color:#111;
+}
+
+body.light .app{
+background:#f5f5f5;
+}
+
+body.light header,
+body.light .bottom,
+body.light .actions{
+background:#fff;
+border-color:#ddd;
+}
+
+body.light #chat{
+background:#f5f5f5;
+}
+
+body.light .ai .msg{
+background:#fff;
+color:#111;
+border-color:#ddd;
+}
+
+body.light #msg{
+background:#eee;
+color:#111;
+border-color:#ddd;
+}
+
+body.light .icon,
+body.light .actions button{
+background:#eee;
+color:#333;
+border-color:#ddd;
+}
+
+@media(max-width:600px){
+
+.msg{
+max-width:94%;
+}
+
+header{
+height:62px;
+}
+
+.brand b{
+font-size:15px;
+}
+
+#chat{
+padding:12px 9px;
+}
+
+.welcome{
+padding-top:35px;
+}
+
+}
+
 </style>
+
+<script async
+src="https://cse.google.com/cse.js?cx=075154fff87ac476e">
+</script>
+
 </head>
 
 <body>
@@ -157,12 +404,17 @@ opacity:.5;
 
 <header>
 
+<div class="brand">
+
 <div class="logo">
 🤖
+</div>
+
 <div>
 <b>Vahid AI</b>
 <small>دستیار هوش مصنوعی وحید</small>
 </div>
+
 </div>
 
 <div class="status">
@@ -171,110 +423,227 @@ opacity:.5;
 
 </header>
 
+
 <div id="chat">
 
-<div class="welcome">
-<div style="font-size:50px">🤖</div>
-<b>سلام وحید 👋</b>
-هر چیزی خواستی از من بپرس.
+<div class="welcome"
+id="welcome">
+
+<div class="welcomeIcon">
+🤖
 </div>
 
-</div>
+<b>
+سلام وحید 👋
+</b>
 
-<button id="clear" onclick="clearChat()">
-🗑️ پاک کردن گفتگو
+<p>
+من Vahid AI هستم.<br>
+هر چیزی خواستی بپرس.
+</p>
+
+<div class="quick">
+
+<button onclick="quick('یک داستان کوتاه و تاریک بنویس')">
+📖 داستان
 </button>
 
+<button onclick="quick('یک متن فلسفی و عمیق بنویس')">
+🧠 فلسفی
+</button>
+
+<button onclick="quick('یک ایده جالب بده')">
+💡 ایده
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div id="imagePanel">
+
+<div id="imagePanelTitle">
+🖼️ نتایج Google Images
+</div>
+
+<div
+class="gcse-searchresults-only"
+data-enableImageSearch="true"
+data-defaultToImageSearch="true"
+data-imageSearchResultSetSize="large">
+</div>
+
+</div>
+
+
+<div class="actions">
+
+<button onclick="newChat()">
+➕ جدید
+</button>
+
+<button onclick="showImages()">
+🖼️ تصاویر
+</button>
+
+<button onclick="exportChat()">
+📄 خروجی
+</button>
+
+<button onclick="toggleTheme()">
+🌙 حالت
+</button>
+
+<button onclick="clearChat()">
+🗑️ پاک کردن
+</button>
+
+</div>
+
+
 <div class="bottom">
+
+<button
+class="icon"
+onclick="startVoice()"
+title="Voice">
+🎤
+</button>
 
 <input
 id="msg"
 placeholder="پیامت رو بنویس..."
 autocomplete="off">
 
-<button id="send" onclick="send()">➤</button>
+<button
+class="icon"
+id="send"
+onclick="send()">
+➤
+</button>
 
 </div>
 
+<div class="footer">
+Vahid AI • Powered by AI
 </div>
+
+</div>
+
 
 <script>
 
-const API=
+/* =========================
+   اتصال فعلی Vahid AI
+========================= */
+
+const API =
 "https://script.google.com/macros/s/AKfycbx3iXj2yaogGSgFyt1HlPnxLrK7TjjLSigrr6j1nFmusdPY7DXHCntRksdbXcK_c0zG/exec";
 
-const input=
+
+const input =
 document.getElementById("msg");
 
-const chat=
+const chat =
 document.getElementById("chat");
 
-const sendBtn=
+const sendBtn =
 document.getElementById("send");
 
-function addMessage(type,text){
+const welcome =
+document.getElementById("welcome");
 
-const div=
-document.createElement("div");
 
-div.className=
-"msg "+type;
-
-div.textContent=
-(type==="user"?"👤 ":"🤖 ")+text;
-
-chat.appendChild(div);
-
-chat.scrollTop=
-chat.scrollHeight;
-}
+/* =========================
+   ارسال پیام
+========================= */
 
 async function send(){
 
-const text=
+const text =
 input.value.trim();
 
-if(!text)return;
+if(!text)
+return;
 
 addMessage("user",text);
 
 input.value="";
 
+if(isImageRequest(text)){
+
+showImages();
+
+searchImages(
+cleanImageQuery(text)
+);
+
+return;
+
+}
+
 sendBtn.disabled=true;
 
-const loading=
+const loading =
 document.createElement("div");
 
-loading.className="msg ai";
+loading.className="row ai";
 
-loading.textContent=
-"🤖 در حال فکر کردن...";
+loading.id="loading";
+
+loading.innerHTML=`
+<div class="msg">
+<div class="typing">
+<i></i>
+<i></i>
+<i></i>
+</div>
+</div>
+`;
 
 chat.appendChild(loading);
 
+chat.scrollTop=chat.scrollHeight;
+
+
 try{
 
-const response=
+const response =
 await fetch(
-API+"?message="+
-encodeURIComponent(text)
+API+
+"?message="+
+encodeURIComponent(text)+
+"&t="+Date.now()
 );
 
-const data=
+const data =
 await response.json();
 
-loading.remove();
+removeLoading();
+
+if(data.ok){
 
 addMessage(
 "ai",
-data.ok?
-data.reply:
-(data.reply||"خطایی رخ داد.")
+data.reply
 );
 
-}catch(e){
+}else{
 
-loading.remove();
+addMessage(
+"ai",
+data.reply ||
+"خطایی رخ داد."
+);
+
+}
+
+}catch(error){
+
+removeLoading();
 
 addMessage(
 "ai",
@@ -286,32 +655,451 @@ addMessage(
 sendBtn.disabled=false;
 
 input.focus();
+
 }
 
-input.addEventListener(
-"keydown",
-e=>{
-if(e.key==="Enter"){
-e.preventDefault();
-send();
-}
-}
+
+/* =========================
+   اضافه کردن پیام
+========================= */
+
+function addMessage(type,text){
+
+if(welcome)
+welcome.style.display="none";
+
+const row =
+document.createElement("div");
+
+row.className=
+"row "+type;
+
+const box =
+document.createElement("div");
+
+box.className="msg";
+
+box.textContent=
+(type==="user"?"👤 ":"🤖 ")+text;
+
+if(type==="ai"){
+
+const tools =
+document.createElement("div");
+
+tools.className="tools";
+
+
+const copy =
+document.createElement("button");
+
+copy.textContent="📋 کپی";
+
+copy.onclick=()=>{
+
+navigator.clipboard
+.writeText(text);
+
+copy.textContent="✓ کپی شد";
+
+setTimeout(
+()=>copy.textContent="📋 کپی",
+1500
 );
 
-function clearChat(){
+};
 
-chat.innerHTML=
-`
-<div class="welcome">
-<div style="font-size:50px">🤖</div>
-<b>سلام وحید 👋</b>
-هر چیزی خواستی از من بپرس.
+
+const speak =
+document.createElement("button");
+
+speak.textContent="🔊 خواندن";
+
+speak.onclick=()=>{
+
+speakText(text);
+
+};
+
+
+tools.appendChild(copy);
+tools.appendChild(speak);
+
+box.appendChild(tools);
+
+}
+
+row.appendChild(box);
+
+chat.appendChild(row);
+
+chat.scrollTop=
+chat.scrollHeight;
+
+saveChat();
+
+}
+
+
+/* =========================
+   Voice
+========================= */
+
+function startVoice(){
+
+const Recognition =
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
+
+if(!Recognition){
+
+alert(
+"مرورگر شما از Voice پشتیبانی نمی‌کند."
+);
+
+return;
+
+}
+
+const voice =
+new Recognition();
+
+voice.lang="fa-IR";
+
+voice.interimResults=false;
+
+voice.maxAlternatives=1;
+
+voice.start();
+
+input.placeholder=
+"🎤 در حال شنیدن...";
+
+voice.onresult=function(e){
+
+input.value=
+e.results[0][0].transcript;
+
+};
+
+voice.onerror=function(){
+
+input.placeholder=
+"پیامت رو بنویس...";
+
+};
+
+voice.onend=function(){
+
+input.placeholder=
+"پیامت رو بنویس...";
+
+};
+
+}
+
+
+/* =========================
+   خواندن جواب
+========================= */
+
+function speakText(text){
+
+if(!window.speechSynthesis){
+
+alert(
+"خواندن متن در این مرورگر پشتیبانی نمی‌شود."
+);
+
+return;
+
+}
+
+speechSynthesis.cancel();
+
+const speech =
+new SpeechSynthesisUtterance(
+text.replace(/[*_#`]/g,"")
+);
+
+speech.lang="fa-IR";
+
+speech.rate=.95;
+
+speechSynthesis.speak(speech);
+
+}
+
+
+/* =========================
+   تصاویر
+========================= */
+
+function isImageRequest(text){
+
+return [
+"عکس",
+"تصویر",
+"تصاویر",
+"عکس بده",
+"تصویر بده",
+"عکس از"
+].some(
+x=>text.includes(x)
+);
+
+}
+
+function cleanImageQuery(text){
+
+return text
+.replaceAll("عکس","")
+.replaceAll("تصویر","")
+.replaceAll("تصاویر","")
+.replaceAll("بده","")
+.replaceAll("بیار","")
+.trim();
+
+}
+
+function showImages(){
+
+document.getElementById(
+"imagePanel"
+).style.display="block";
+
+}
+
+function searchImages(query){
+
+showImages();
+
+setTimeout(()=>{
+
+if(
+window.google &&
+google.search &&
+google.search.cse
+){
+
+const elements =
+google.search.cse.element
+.getAllElements();
+
+const names =
+Object.keys(elements);
+
+if(names.length){
+
+elements[names[0]]
+.execute(query);
+
+}
+
+}
+
+},700);
+
+}
+
+
+/* =========================
+   پیام سریع
+========================= */
+
+function quick(text){
+
+input.value=text;
+
+send();
+
+}
+
+
+/* =========================
+   گفتگوی جدید
+========================= */
+
+function newChat(){
+
+chat.innerHTML=`
+<div class="welcome" id="welcome">
+
+<div class="welcomeIcon">
+🤖
+</div>
+
+<b>
+گفتگوی جدید
+</b>
+
+<p>
+سلام وحید 👋<br>
+آماده‌ام.
+</p>
+
 </div>
 `;
 
+localStorage.removeItem(
+"vahid_chat"
+);
+
 }
+
+
+/* =========================
+   پاک کردن
+========================= */
+
+function clearChat(){
+
+if(
+confirm("کل گفتگو پاک شود؟")
+){
+
+newChat();
+
+}
+
+}
+
+
+/* =========================
+   ذخیره گفتگو
+========================= */
+
+function saveChat(){
+
+localStorage.setItem(
+"vahid_chat",
+chat.innerHTML
+);
+
+}
+
+
+/* =========================
+   بازیابی گفتگو
+========================= */
+
+function loadChat(){
+
+const saved =
+localStorage.getItem(
+"vahid_chat"
+);
+
+if(saved){
+
+chat.innerHTML=saved;
+
+}
+
+}
+
+loadChat();
+
+
+/* =========================
+   خروجی گفتگو
+========================= */
+
+function exportChat(){
+
+const text =
+chat.innerText;
+
+const blob =
+new Blob(
+[text],
+{
+type:"text/plain;charset=utf-8"
+}
+);
+
+const url =
+URL.createObjectURL(blob);
+
+const a =
+document.createElement("a");
+
+a.href=url;
+
+a.download=
+"Vahid-AI-Chat.txt";
+
+a.click();
+
+URL.revokeObjectURL(url);
+
+}
+
+
+/* =========================
+   حالت روشن / تاریک
+========================= */
+
+function toggleTheme(){
+
+document.body.classList.toggle(
+"light"
+);
+
+localStorage.setItem(
+"vahid_theme",
+document.body.classList.contains("light")
+?"light":"dark"
+);
+
+}
+
+if(
+localStorage.getItem("vahid_theme")
+==="light"
+){
+
+document.body.classList.add("light");
+
+}
+
+
+/* =========================
+   حذف Loading
+========================= */
+
+function removeLoading(){
+
+const x =
+document.getElementById(
+"loading"
+);
+
+if(x)
+x.remove();
+
+}
+
+
+/* =========================
+   Enter
+========================= */
+
+input.addEventListener(
+"keydown",
+function(e){
+
+if(e.key==="Enter"){
+
+e.preventDefault();
+
+send();
+
+}
+
+});
 
 </script>
 
 </body>
-</html>
+  </html>
