@@ -19,4 +19,857 @@ body{
 }
 
 .app{
-   
+    max-width:850px;
+    margin:auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+header{
+    padding:18px;
+    text-align:center;
+    border-bottom:1px solid #222;
+    position:sticky;
+    top:0;
+    background:#080808;
+    z-index:5;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:bold;
+}
+
+.subtitle{
+    color:#888;
+    font-size:12px;
+    margin-top:5px;
+}
+
+#chat{
+    flex:1;
+    padding:20px 14px 110px;
+    overflow-y:auto;
+}
+
+.welcome{
+    text-align:center;
+    padding:60px 20px;
+    color:#aaa;
+}
+
+.welcome h2{
+    color:#fff;
+}
+
+.message{
+    margin:12px 0;
+    padding:13px 15px;
+    border-radius:15px;
+    line-height:1.9;
+    white-space:pre-wrap;
+    word-wrap:break-word;
+}
+
+.user{
+    background:#173d2b;
+    margin-right:35px;
+}
+
+.ai{
+    background:#171717;
+    border:1px solid #292929;
+    margin-left:35px;
+}
+
+.time{
+    color:#666;
+    font-size:10px;
+    margin-top:5px;
+}
+
+.bottom{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#090909;
+    border-top:1px solid #222;
+    padding:10px;
+}
+
+.inputbox{
+    max-width:850px;
+    margin:auto;
+    display:flex;
+    gap:8px;
+}
+
+textarea{
+    flex:1;
+    resize:none;
+    min-height:48px;
+    max-height:130px;
+    background:#151515;
+    border:1px solid #333;
+    color:#fff;
+    border-radius:15px;
+    padding:13px;
+    outline:none;
+    font-family:inherit;
+}
+
+button{
+    border:0;
+    border-radius:13px;
+    background:#1f8f55;
+    color:white;
+    padding:0 17px;
+    cursor:pointer;
+    font-family:inherit;
+}
+
+button:active{
+    transform:scale(.97);
+}
+
+.tools{
+    max-width:850px;
+    margin:8px auto 0;
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+}
+
+.tool{
+    background:#181818;
+    border:1px solid #292929;
+    padding:7px 11px;
+    font-size:12px;
+    white-space:nowrap;
+}
+
+.typing{
+    color:#888;
+    font-size:13px;
+    padding:10px;
+}
+
+.status{
+    text-align:center;
+    color:#666;
+    font-size:11px;
+    padding:4px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <div class="logo">🤖 Vahid AI</div>
+    <div class="subtitle">دستیار هوش مصنوعی وحید</div>
+</header>
+
+<div id="chat">
+
+    <div id="welcome" class="welcome">
+        <h2>سلام وحید 👋</h2>
+        <p>من Vahid AI هستم.</p>
+        <p>هر چیزی می‌خوای بپرس...</p>
+    </div>
+
+</div>
+
+<div class="bottom">
+
+    <div id="status" class="status">
+        آماده
+    </div>
+
+    <div class="inputbox">
+
+        <textarea
+            id="msg"
+            placeholder="پیامت رو بنویس..."
+            rows="1"></textarea>
+
+        <button id="send">ارسال</button>
+
+    </div>
+
+    <div class="tools">
+
+        <button class="tool" onclick="newChat()">
+            🆕 چت جدید
+        </button>
+
+        <button class="tool" onclick="clearChat()">
+            🗑 پاک کردن
+        </button>
+
+        <button class="tool" onclick="toggleVoice()">
+            🎤 صدا
+        </button>
+
+        <button class="tool" onclick="exportChat()">
+            💾 ذخیره
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================================
+   تنظیمات
+========================================= */
+
+const API =
+"https://script.google.com/macros/s/AKfycbx3iXj2yaogGSgFyt1HlPnxLrK7TjjLSigrr6j1nFmusdPY7DXHCntRksdbXcK_c0zG/exec";
+
+
+/* =========================================
+   عناصر صفحه
+========================================= */
+
+const input =
+document.getElementById("msg");
+
+const chat =
+document.getElementById("chat");
+
+const sendBtn =
+document.getElementById("send");
+
+const welcome =
+document.getElementById("welcome");
+
+const status =
+document.getElementById("status");
+
+
+/* =========================================
+   حافظه Vahid AI
+========================================= */
+
+const MEMORY_KEY =
+"vahid_ai_memory";
+
+function getMemory(){
+
+    const data =
+    localStorage.getItem(MEMORY_KEY);
+
+    if(!data)
+        return {};
+
+    try{
+        return JSON.parse(data);
+    }
+    catch(e){
+        return {};
+    }
+}
+
+function saveMemory(memory){
+
+    localStorage.setItem(
+        MEMORY_KEY,
+        JSON.stringify(memory)
+    );
+
+}
+
+function remember(key,value){
+
+    const memory =
+    getMemory();
+
+    memory[key] = value;
+
+    saveMemory(memory);
+
+}
+
+function forgetMemory(){
+
+    localStorage.removeItem(
+        MEMORY_KEY
+    );
+
+}
+
+
+/* =========================================
+   تاریخچه چت
+========================================= */
+
+const CHAT_KEY =
+"vahid_chat";
+
+function getChatHistory(){
+
+    const data =
+    localStorage.getItem(CHAT_KEY);
+
+    if(!data)
+        return [];
+
+    try{
+        return JSON.parse(data);
+    }
+    catch(e){
+        return [];
+    }
+}
+
+function saveChatHistory(){
+
+    const messages =
+    [];
+
+    document
+    .querySelectorAll(".message")
+    .forEach(el => {
+
+        messages.push({
+            type:
+            el.classList.contains("user")
+            ? "user"
+            : "ai",
+
+            text:
+            el.innerText
+        });
+
+    });
+
+    localStorage.setItem(
+        CHAT_KEY,
+        JSON.stringify(messages)
+    );
+
+}
+
+function loadChatHistory(){
+
+    const history =
+    getChatHistory();
+
+    if(history.length === 0)
+        return;
+
+    welcome.style.display =
+    "none";
+
+    history.forEach(item => {
+
+        addMessage(
+            item.text,
+            item.type,
+            false
+        );
+
+    });
+
+}
+
+
+/* =========================================
+   افزودن پیام
+========================================= */
+
+function addMessage(
+    text,
+    type,
+    save = true
+){
+
+    if(welcome)
+        welcome.style.display =
+        "none";
+
+    const div =
+    document.createElement("div");
+
+    div.className =
+    "message " + type;
+
+    div.innerText =
+    text;
+
+    chat.appendChild(div);
+
+    chat.scrollTop =
+    chat.scrollHeight;
+
+    if(save)
+        saveChatHistory();
+
+}
+
+
+/* =========================================
+   وضعیت
+========================================= */
+
+function setStatus(text){
+
+    status.innerText =
+    text;
+
+}
+
+
+/* =========================================
+   تشخیص حافظه
+========================================= */
+
+function checkMemory(text){
+
+    const patterns = [
+
+        {
+            regex:/اسمم\s+(.+?)\s*(?:است|هست)$/i,
+            key:"name"
+        },
+
+        {
+            regex:/من\s+(.+?)\s*(?:هستم|ام)$/i,
+            key:"about"
+        }
+
+    ];
+
+    for(const item of patterns){
+
+        const match =
+        text.match(item.regex);
+
+        if(match){
+
+            remember(
+                item.key,
+                match[1].trim()
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================
+   ارسال پیام
+========================================= */
+
+async function sendMessage(){
+
+    const text =
+    input.value.trim();
+
+    if(!text)
+        return;
+
+    addMessage(
+        text,
+        "user"
+    );
+
+    checkMemory(text);
+
+    input.value = "";
+
+    setStatus(
+        "Vahid AI در حال فکر کردن..."
+    );
+
+    const typing =
+    document.createElement("div");
+
+    typing.className =
+    "typing";
+
+    typing.id =
+    "typing";
+
+    typing.innerText =
+    "🤖 در حال فکر کردن...";
+
+    chat.appendChild(typing);
+
+    chat.scrollTop =
+    chat.scrollHeight;
+
+    try{
+
+        const url =
+        API +
+        "?message=" +
+        encodeURIComponent(text);
+
+        const response =
+        await fetch(url);
+
+        const data =
+        await response.json();
+
+        if(
+            document.getElementById(
+                "typing"
+            )
+        ){
+
+            document
+            .getElementById("typing")
+            .remove();
+
+        }
+
+        let reply =
+        data.reply ||
+        data.message ||
+        "پاسخی دریافت نشد.";
+
+        addMessage(
+            reply,
+            "ai"
+        );
+
+        speak(reply);
+
+        setStatus(
+            "آماده"
+        );
+
+    }
+    catch(error){
+
+        if(
+            document.getElementById(
+                "typing"
+            )
+        ){
+
+            document
+            .getElementById("typing")
+            .remove();
+
+        }
+
+        addMessage(
+            "اتصال به Vahid AI برقرار نشد.\n\n" +
+            "اینترنت و آدرس API را بررسی کن.",
+            "ai"
+        );
+
+        setStatus(
+            "خطا در اتصال"
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   دکمه ارسال
+========================================= */
+
+sendBtn.addEventListener(
+    "click",
+    sendMessage
+);
+
+
+/* =========================================
+   Enter
+========================================= */
+
+input.addEventListener(
+    "keydown",
+    function(e){
+
+        if(
+            e.key === "Enter" &&
+            !e.shiftKey
+        ){
+
+            e.preventDefault();
+
+            sendMessage();
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   چت جدید
+========================================= */
+
+function newChat(){
+
+    chat.innerHTML = "";
+
+    const div =
+    document.createElement("div");
+
+    div.id =
+    "welcome";
+
+    div.className =
+    "welcome";
+
+    div.innerHTML =
+    "<h2>سلام وحید 👋</h2>" +
+    "<p>چت جدید شروع شد.</p>";
+
+    chat.appendChild(div);
+
+    localStorage.removeItem(
+        CHAT_KEY
+    );
+
+    setStatus(
+        "چت جدید"
+    );
+
+}
+
+
+/* =========================================
+   پاک کردن چت
+========================================= */
+
+function clearChat(){
+
+    if(
+        !confirm(
+            "همه پیام‌های این چت پاک شود؟"
+        )
+    )
+        return;
+
+    newChat();
+
+}
+
+
+/* =========================================
+   خروجی گرفتن از چت
+========================================= */
+
+function exportChat(){
+
+    const history =
+    getChatHistory();
+
+    if(
+        history.length === 0
+    ){
+
+        alert(
+            "هنوز پیامی وجود ندارد."
+        );
+
+        return;
+
+    }
+
+    let text =
+    "Vahid AI\n\n";
+
+    history.forEach(item => {
+
+        text +=
+        (
+            item.type === "user"
+            ? "وحید: "
+            : "Vahid AI: "
+        );
+
+        text +=
+        item.text +
+        "\n\n";
+
+    });
+
+    const blob =
+    new Blob(
+        [text],
+        {
+            type:
+            "text/plain;charset=utf-8"
+        }
+    );
+
+    const url =
+    URL.createObjectURL(blob);
+
+    const a =
+    document.createElement("a");
+
+    a.href =
+    url;
+
+    a.download =
+    "Vahid-AI-Chat.txt";
+
+    a.click();
+
+    URL.revokeObjectURL(
+        url
+    );
+
+}
+
+
+/* =========================================
+   تبدیل متن به صدا
+========================================= */
+
+function speak(text){
+
+    if(
+        !("speechSynthesis" in window)
+    )
+        return;
+
+    const speech =
+    new SpeechSynthesisUtterance(
+        text
+    );
+
+    speech.lang =
+    "fa-IR";
+
+    speech.rate =
+    0.95;
+
+    window.speechSynthesis.cancel();
+
+    window.speechSynthesis.speak(
+        speech
+    );
+
+}
+
+
+/* =========================================
+   ورودی صوتی
+========================================= */
+
+let recognition =
+null;
+
+let listening =
+false;
+
+function toggleVoice(){
+
+    const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+    if(!SpeechRecognition){
+
+        alert(
+            "مرورگر گوشی از تشخیص صدا پشتیبانی نمی‌کند."
+        );
+
+        return;
+
+    }
+
+    if(listening){
+
+        recognition.stop();
+
+        return;
+
+    }
+
+    recognition =
+    new SpeechRecognition();
+
+    recognition.lang =
+    "fa-IR";
+
+    recognition.continuous =
+    false;
+
+    recognition.interimResults =
+    false;
+
+    recognition.onstart =
+    function(){
+
+        listening =
+        true;
+
+        setStatus(
+            "🎤 در حال گوش دادن..."
+        );
+
+    };
+
+    recognition.onresult =
+    function(event){
+
+        const text =
+        event.results[0][0].transcript;
+
+        input.value =
+        text;
+
+    };
+
+    recognition.onend =
+    function(){
+
+        listening =
+        false;
+
+        setStatus(
+            "آماده"
+        );
+
+    };
+
+    recognition.onerror =
+    function(){
+
+        listening =
+        false;
+
+        setStatus(
+            "خطا در صدا"
+        );
+
+    };
+
+    recognition.start();
+
+}
+
+
+/* =========================================
+   شروع برنامه
+========================================= */
+
+loadChatHistory();
+
+</script>
+
+</body>
+    </html>
